@@ -20,13 +20,15 @@ public class JedisPool extends Pool<Jedis> {
     }
 
     public JedisPool(final String host) {
-	URI uri = URI.create(host);
-	if (uri.getScheme() != null && uri.getScheme().equals("redis")) {
+	RedisURI uri = RedisURI.create(host);
+
+     if (uri.isRedisURI()) {
 	    String h = uri.getHost();
 	    int port = uri.getPort();
-	    String password = uri.getUserInfo().split(":", 2)[1];
-	    int database = Integer.parseInt(uri.getPath().split("/", 2)[1]);
-	    this.internalPool = new GenericObjectPool<Jedis>(
+	    String password = uri.getPassword();
+        int database = uri.getDatabase();
+
+        this.internalPool = new GenericObjectPool<Jedis>(
 		    new JedisFactory(h, port, Protocol.DEFAULT_TIMEOUT,
 			    password, database, null),
 		    new GenericObjectPoolConfig());
@@ -39,13 +41,14 @@ public class JedisPool extends Pool<Jedis> {
     }
 
     public JedisPool(final URI uri) {
-	String h = uri.getHost();
-	int port = uri.getPort();
-	String password = uri.getUserInfo().split(":", 2)[1];
-	int database = Integer.parseInt(uri.getPath().split("/", 2)[1]);
-	this.internalPool = new GenericObjectPool<Jedis>(new JedisFactory(h,
-		port, Protocol.DEFAULT_TIMEOUT, password, database, null),
-		new GenericObjectPoolConfig());
+        RedisURI redisURI = RedisURI.create(uri.toString());
+        String h = uri.getHost();
+        int port = uri.getPort();
+        String password = redisURI.getPassword();
+        int database = redisURI.getDatabase();
+        this.internalPool = new GenericObjectPool<Jedis>(new JedisFactory(h,
+            port, Protocol.DEFAULT_TIMEOUT, password, database, null),
+            new GenericObjectPoolConfig());
     }
 
     public JedisPool(final GenericObjectPoolConfig poolConfig,

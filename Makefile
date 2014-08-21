@@ -274,7 +274,7 @@ deploy:
 	make stop
 
 release:
-	make start
+	#make start
 	mvn release:clean
 	mvn release:prepare
 	mvn release:perform
