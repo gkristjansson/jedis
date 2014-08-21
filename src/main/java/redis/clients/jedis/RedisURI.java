@@ -48,7 +48,7 @@ public class RedisURI extends URI {
 
             }
         } catch (NumberFormatException e) {
-            throw new URISyntaxException("Database needs to be a integer");
+            return 0;
         }
 
         return 0;
